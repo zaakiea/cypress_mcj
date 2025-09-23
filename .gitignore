@@ -49,6 +49,7 @@ next-env.d.ts
 /prisma/seed-career-paths.ts
 /prisma/seed-dashboard.ts
 /prisma/seed-superuser.ts
+/prisma/seed-prod-dashboard.ts
 
 # data
 /data/dataStandards.ts

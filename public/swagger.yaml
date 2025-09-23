@@ -1,0 +1,492 @@
+openapi: 3.0.0
+info:
+  title: "My Career Journey API"
+  description: "Dokumentasi API lengkap untuk aplikasi My Career Journey, mencakup manajemen data karyawan, lowongan pekerjaan, kuesioner, dan dashboard analitik."
+  version: "1.0.0"
+servers:
+  - url: "/api"
+    description: "API Server Lokal"
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Otentikasi menggunakan JWT yang didapat setelah login."
+  responses:
+    UnauthorizedError:
+      description: "Akses ditolak karena tidak terautentikasi."
+    ForbiddenError:
+      description: "Akses ditolak karena tidak memiliki izin."
+    BadRequest:
+      description: "Data yang dikirim tidak valid."
+    NotFound:
+      description: "Resource tidak ditemukan."
+    Conflict:
+      description: "Terjadi konflik, data mungkin sudah ada."
+    InternalServerError:
+      description: "Terjadi kesalahan pada server."
+
+paths:
+  # ===============================================================
+  #  AUTH
+  # ===============================================================
+  /auth/callback/credentials:
+    post:
+      tags: [Auth]
+      summary: "Login Pengguna"
+      description: "Otentikasi pengguna menggunakan employeeId dan password untuk mendapatkan session token (JWT)."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeId: { type: string, example: "12345" }
+                password:
+                  { type: string, format: password, example: "password123" }
+      responses:
+        "200": { description: "Login berhasil." }
+        "401": { description: "Unauthorized: ID atau password salah." }
+
+  # ===============================================================
+  #  ADMIN - DASHBOARD
+  # ===============================================================
+  /admin/dashboard/kpis:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Mengambil KPI Dashboard"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/dashboard/employee-distribution:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Data Distribusi Karyawan"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/dashboard/questionnaire-trend:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Tren Pengisian Kuesioner"
+      parameters:
+        - {
+            name: startDate,
+            in: query,
+            required: true,
+            schema: { type: string, format: date },
+          }
+        - {
+            name: endDate,
+            in: query,
+            required: true,
+            schema: { type: string, format: date },
+          }
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/dashboard/relocation-summary:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Ringkasan Kesediaan Relokasi"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/dashboard/recent-activities:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Aktivitas Terbaru"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/dashboard/recent-job-interests:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Minat Pekerjaan Terbaru (Khusus HD)"
+      responses:
+        "200": { description: "Sukses" }
+        "403": { $ref: "#/components/responses/ForbiddenError" }
+
+  /admin/dashboard/competency-by-department:
+    get:
+      tags: [Admin - Dashboard]
+      summary: "Rata-rata Skor Kompetensi per Departemen"
+      responses:
+        "200": { description: "Sukses" }
+
+  # ===============================================================
+  #  ADMIN - MASTER DATA
+  # ===============================================================
+  /admin/master-data:
+    get:
+      tags: [Admin - Master Data]
+      summary: "Mengambil semua Master Data"
+      description: "Endpoint terpusat untuk mengambil data seperti cabang, departemen, posisi, level, dan job roles."
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/levels:
+    get:
+      tags: [Admin - Master Data]
+      summary: "Mengambil semua Level Jabatan"
+      responses:
+        "200": { description: "Sukses" }
+
+  # ===============================================================
+  #  ADMIN - EMPLOYEES
+  # ===============================================================
+  /admin/employees:
+    get:
+      tags: [Admin - Employees]
+      summary: "Mengambil daftar karyawan"
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 10 } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: branchId, in: query, schema: { type: string } }
+        - { name: departmentId, in: query, schema: { type: string } }
+      responses:
+        "200": { description: "Sukses" }
+
+    post:
+      tags: [Admin - Employees]
+      summary: "Membuat karyawan baru"
+      responses:
+        "201": { description: "Berhasil dibuat" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /admin/employees/{employeeId}:
+    get:
+      tags: [Admin - Employees]
+      summary: "Mengambil detail karyawan"
+      parameters:
+        - {
+            name: employeeId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Admin - Employees]
+      summary: "Memperbarui data karyawan"
+      parameters:
+        - {
+            name: employeeId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Berhasil diperbarui" }
+    delete:
+      tags: [Admin - Employees]
+      summary: "Menghapus karyawan"
+      parameters:
+        - {
+            name: employeeId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "204": { description: "Berhasil dihapus" }
+
+  /admin/employees/sync/analyze:
+    post:
+      tags: [Admin - Employees Sync]
+      summary: "[Step 1] Menganalisis file Excel untuk sinkronisasi"
+      responses:
+        "200": { description: "Analisis berhasil." }
+        "400": { description: "File tidak valid." }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /admin/employees/sync/start:
+    post:
+      tags: [Admin - Employees Sync]
+      summary: "[Step 2] Memulai proses sinkronisasi"
+      responses:
+        "202": { description: "Proses sinkronisasi dimulai." }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/employees/sync/execute:
+    post:
+      tags: [Admin - Employees Sync]
+      summary: "[Step 3] Mengeksekusi sinkronisasi (Internal/Cron)"
+      security: []
+      responses:
+        "200": { description: "Sinkronisasi berhasil." }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
+  /admin/employees/sync/status:
+    get:
+      tags: [Admin - Employees Sync]
+      summary: "Mengecek status proses sinkronisasi"
+      parameters:
+        - {
+            name: jobId,
+            in: query,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200": { description: "Sukses" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ===============================================================
+  #  ADMIN - JOB VACANCIES & CAREER PATH
+  # ===============================================================
+  /admin/job-vacancies:
+    get:
+      tags: [Admin - Job Vacancies]
+      summary: "Mengambil Daftar Lowongan Pekerjaan"
+      responses:
+        "200": { description: "Sukses" }
+    post:
+      tags: [Admin - Job Vacancies]
+      summary: "Membuat Lowongan Pekerjaan Baru"
+      responses:
+        "201": { description: "Berhasil dibuat" }
+
+  /admin/job-vacancies/{jobVacancyId}:
+    get:
+      tags: [Admin - Job Vacancies]
+      summary: "Mengambil Detail Lowongan"
+      parameters:
+        - {
+            name: jobVacancyId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+    put:
+      tags: [Admin - Job Vacancies]
+      summary: "Memperbarui Lowongan"
+      parameters:
+        - {
+            name: jobVacancyId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+    delete:
+      tags: [Admin - Job Vacancies]
+      summary: "Menghapus Lowongan"
+      parameters:
+        - {
+            name: jobVacancyId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "204": { description: "Berhasil dihapus" }
+
+  /admin/job-vacancies/{jobVacancyId}/interests:
+    get:
+      tags: [Admin - Job Vacancies]
+      summary: "Melihat Peminat Lowongan"
+      parameters:
+        - {
+            name: jobVacancyId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/job-vacancies/sync-retirements:
+    post:
+      tags: [Admin - Job Vacancies Sync]
+      summary: "[Step 1] Menganalisis lowongan dari data pensiun"
+      responses:
+        "200": { description: "Analisis berhasil." }
+    put:
+      tags: [Admin - Job Vacancies Sync]
+      summary: "[Step 2] Mengeksekusi pembuatan lowongan dari hasil analisis"
+      responses:
+        "200": { description: "Sinkronisasi berhasil." }
+
+  /admin/career-path:
+    get:
+      tags: [Admin - Career Path]
+      summary: "Mengambil daftar jenjang karir"
+      responses:
+        "200": { description: "Sukses" }
+    post:
+      tags: [Admin - Career Path]
+      summary: "Membuat jenjang karir baru"
+      responses:
+        "201": { description: "Sukses" }
+
+  /admin/career-path/{pathId}:
+    put:
+      tags: [Admin - Career Path]
+      summary: "Memperbarui jenjang karir"
+      parameters:
+        - { name: pathId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: "Sukses" }
+    delete:
+      tags: [Admin - Career Path]
+      summary: "Menghapus jenjang karir"
+      parameters:
+        - { name: pathId, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: "Sukses" }
+
+  # ===============================================================
+  #  ADMIN - FORMS & QUESTIONNAIRES
+  # ===============================================================
+  /admin/forms:
+    get:
+      tags: [Admin - Forms]
+      summary: "Mengambil daftar formulir yang telah diisi"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/forms/{employeeId}:
+    get:
+      tags: [Admin - Forms]
+      summary: "Mengambil detail formulir seorang karyawan"
+      parameters:
+        - {
+            name: employeeId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/competency-results:
+    get:
+      tags: [Admin - Questionnaires]
+      summary: "Mengambil ringkasan hasil kuesioner kompetensi"
+      responses:
+        "200": { description: "Sukses" }
+
+  /admin/competency-results/{employeeId}:
+    get:
+      tags: [Admin - Questionnaires]
+      summary: "Mengambil detail hasil kuesioner seorang karyawan"
+      parameters:
+        - {
+            name: employeeId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+
+  # ===============================================================
+  #  EMPLOYEE
+  # ===============================================================
+  /employee/dashboard:
+    get:
+      tags: [Employee]
+      summary: "Mengambil data dashboard karyawan"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/form:
+    get:
+      tags: [Employee]
+      summary: "Mengambil data formulir karyawan"
+      responses:
+        "200": { description: "Sukses" }
+    post:
+      tags: [Employee]
+      summary: "Menyimpan data formulir karyawan"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/master-data:
+    get:
+      tags: [Employee]
+      summary: "Mengambil data master untuk form karyawan"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/job-vacant/opportunities:
+    get:
+      tags: [Employee]
+      summary: "Mendapatkan daftar lowongan yang tersedia"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/job-vacant/status:
+    get:
+      tags: [Employee]
+      summary: "Mengecek status pengisian minat karir"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/job-vacant/interest:
+    post:
+      tags: [Employee]
+      summary: "Menyatakan minat pada sebuah lowongan"
+      responses:
+        "201": { description: "Minat berhasil dicatat" }
+        "409": { description: "Sudah pernah menyatakan minat" }
+
+  /employee/questionnaires:
+    get:
+      tags: [Employee]
+      summary: "Mendapatkan daftar kuesioner yang harus diisi"
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/questionnaires/{questionnaireId}:
+    get:
+      tags: [Employee]
+      summary: "Mendapatkan detail pertanyaan kuesioner"
+      parameters:
+        - {
+            name: questionnaireId,
+            in: path,
+            required: true,
+            schema: { type: string },
+          }
+      responses:
+        "200": { description: "Sukses" }
+
+  /employee/questionnaires/submit:
+    post:
+      tags: [Employee]
+      summary: "Mengirimkan jawaban kuesioner"
+      responses:
+        "200": { description: "Jawaban berhasil dikirim" }
+        "409": { description: "Kuesioner sudah pernah diisi" }
+
+  /employee/update-relocation:
+    post:
+      tags: [Employee]
+      summary: "Memperbarui status kesediaan relokasi"
+      responses:
+        "200": { description: "Preferensi berhasil disimpan" }
+
+  # ===============================================================
+  #  TASKS (Internal)
+  # ===============================================================
+  /tasks/process-questionnaire:
+    post:
+      tags: [Tasks]
+      summary: "Memproses hasil kuesioner (Internal)"
+      security: []
+      responses:
+        "200": { description: "Proses berhasil" }
+        "401": { description: "Akses ditolak" }
