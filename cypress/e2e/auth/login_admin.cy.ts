@@ -1,3 +1,4 @@
+//cypress/e2e/auth/login_admin.cy.ts
 describe("Pengujian Halaman Login Admin", () => {
   beforeEach(() => {
     // Kunjungi halaman login sebelum setiap tes
@@ -67,7 +68,6 @@ describe("Pengujian Halaman Login Admin", () => {
       cy.get('input[id="password"]').type("password-salah-12345");
       cy.get('button[type="submit"]').click();
 
-      // **VALIDASI DIPERBARUI**
       // Cek notifikasi alert (bukan toast)
       cy.get('div[role="alert"]')
         .should("be.visible")
@@ -81,7 +81,6 @@ describe("Pengujian Halaman Login Admin", () => {
       cy.get('input[id="password"]').type(Cypress.env("TEST_ADMIN_PASSWORD"));
       cy.get('button[type="submit"]').click();
 
-      // **VALIDASI DIPERBARUI**
       // Cek notifikasi alert
       cy.get('div[role="alert"]')
         .should("be.visible")
@@ -95,12 +94,11 @@ describe("Pengujian Halaman Login Admin", () => {
   // SKENARIO 3: PENGUJIAN EKSTREM & KEAMANAN
   // ------------------------------------------
   context("SKENARIO 3: Pengujian Ekstrem & Keamanan", () => {
-    it("Harus gagal pada percobaan basic SQL injection", () => {
+    it("Harus gagal pada percobaan basic SQL injection (' OR '1'='1')", () => {
       cy.get('input[id="employeeId"]').type("' OR '1'='1");
       cy.get('input[id="password"]').type("' OR '1'='1");
       cy.get('button[type="submit"]').click();
 
-      // **VALIDASI DIPERBARUI**
       // Server harus menolak ini dan menampilkan alert
       cy.get('div[role="alert"]')
         .should("be.visible")
@@ -108,12 +106,73 @@ describe("Pengujian Halaman Login Admin", () => {
 
       cy.url().should("include", "/login");
     });
+
+    it("Harus gagal pada percobaan SQL injection dengan komentar (--)", () => {
+      cy.get('input[id="employeeId"]').type("12345' -- "); // NIK dengan komentar SQL
+      cy.get('input[id="password"]').type("passwordapapun");
+      cy.get('button[type="submit"]').click();
+
+      // Server harus menolak ini dan menampilkan alert
+      cy.get('div[role="alert"]')
+        .should("be.visible")
+        .and("contain", "Gagal Masuk");
+      cy.url().should("include", "/login");
+    });
+
+    it("Harus gagal dengan input emoji", () => {
+      cy.get('input[id="employeeId"]').type("😀😀😀");
+      cy.get('input[id="password"]').type("🔑🔑🔑");
+      cy.get('button[type="submit"]').click();
+
+      // Server harus menolak ini
+      cy.get('div[role="alert"]')
+        .should("be.visible")
+        .and("contain", "Gagal Masuk");
+      cy.url().should("include", "/login");
+    });
+
+    it("Harus gagal dengan input karakter Unicode dan simbol campuran", () => {
+      cy.get('input[id="employeeId"]').type("üñîçødé!@#");
+      cy.get('input[id="password"]').type("®™€§¥");
+      cy.get('button[type="submit"]').click();
+
+      // Server harus menolak ini
+      cy.get('div[role="alert"]')
+        .should("be.visible")
+        .and("contain", "Gagal Masuk");
+      cy.url().should("include", "/login");
+    });
+
+    it("Harus gagal dengan input string yang sangat panjang", () => {
+      const longString = "1".repeat(2000); // 2000 karakter
+      cy.get('input[id="employeeId"]').type(longString);
+      cy.get('input[id="password"]').type("password");
+      cy.get('button[type="submit"]').click();
+
+      // Server harus menolak ini (kemungkinan karena validasi NIK gagal)
+      cy.get('div[role="alert"]')
+        .should("be.visible")
+        .and("contain", "Gagal Masuk");
+      cy.url().should("include", "/login");
+    });
+
+    it("Harus menampilkan validasi HTML5 untuk input yang hanya berisi spasi", () => {
+      cy.get('input[id="employeeId"]').type("     "); // Input spasi
+      cy.get('input[id="password"]').type("     "); // Input spasi
+      cy.get('button[type="submit"]').click();
+
+      // Browser harus menangkap ini sebagai field kosong karena atribut 'required'
+      cy.get('div[role="alert"]')
+        .should("be.visible")
+        .and("contain", "Gagal Masuk");
+      cy.url().should("include", "/login");
+    });
   });
 
   // ------------------------------------------
   // SKENARIO 4: Percobaan Berhasil Login
   // ------------------------------------------
-  context("SKENARIO 4: Percobaan Login Berhasil", () => {
+  context("SKENARIO 4: Percobaan Berhasil Login", () => {
     it("Harus berhasil login dengan kredensial admin yang valid", () => {
       const adminNik = Cypress.env("TEST_ADMIN_ID");
       const adminPassword = Cypress.env("TEST_ADMIN_PASSWORD");
