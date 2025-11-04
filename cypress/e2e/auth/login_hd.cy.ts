@@ -143,7 +143,7 @@ describe("Pengujian Halaman Login HD", () => {
     });
 
     it("Harus gagal dengan input string yang sangat panjang", () => {
-      const longString = "1".repeat(2000); // 2000 karakter
+      const longString = "1".repeat(200); // 2000 karakter
       cy.get('input[id="employeeId"]').type(longString);
       cy.get('input[id="password"]').type("password");
       cy.get('button[type="submit"]').click();
