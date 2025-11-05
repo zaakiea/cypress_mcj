@@ -120,6 +120,43 @@ describe("Manajemen Departemen (Admin)", () => {
       cy.contains("button", "Filter").should("have.class", "bg-primary");
     });
 
+    it("harus bisa mengubah jumlah [Show entries] per halaman", () => {
+      // 1. Verifikasi nilai default adalah 10 dan 10 baris
+      cy.contains("Show")
+        .next('button[role="combobox"]')
+        .should("contain", "10");
+      cy.get("table tbody tr").should("have.length", 10);
+      cy.contains("Showing 1 to 10 of 234 entries").should("be.visible");
+
+      // 2. Buka dropdown
+      cy.contains("Show").next('button[role="combobox"]').click();
+
+      // 3. Klik opsi "25" (ini ada di luar tombol)
+      cy.get('div[role="option"]').contains("25").click();
+      cy.wait(1000); // Tunggu data reload
+
+      // 4. Verifikasi nilai berubah ke 25 dan 25 baris
+      cy.contains("Show")
+        .next('button[role="combobox"]')
+        .should("contain", "25");
+      cy.get("table tbody tr").should("have.length", 25);
+      cy.contains("Showing 1 to 25 of 234 entries").should("be.visible");
+
+      // 5. Buka dropdown lagi
+      cy.contains("Show").next('button[role="combobox"]').click();
+
+      // 6. Klik opsi "50"
+      cy.get('div[role="option"]').contains("50").click();
+      cy.wait(1000); // Tunggu data reload
+
+      // 7. Verifikasi nilai berubah ke 50 dan 50 baris
+      cy.contains("Show")
+        .next('button[role="combobox"]')
+        .should("contain", "50");
+      cy.get("table tbody tr").should("have.length", 50);
+      cy.contains("Showing 1 to 50 of 234 entries").should("be.visible");
+    });
+
     it("harus bisa mengganti urutan [Sorting] kolom 'Nama Departemen' dan tabel berubah", () => {
       cy.get("table th").contains("Nama Departemen").as("headerNama");
 
@@ -181,7 +218,7 @@ describe("Manajemen Departemen (Admin)", () => {
       cy.get("table tbody tr:first-child td:nth-child(2)").should(
         "contain",
         "Tj. Api Api"
-      ); // "Tj. Api Api" harusnya jadi yang pertama
+      );
     });
     it("harus bisa berpindah halaman menggunakan [Paginasi]", function () {
       const paginationText = "Showing 1 to 10 of 234 entries";

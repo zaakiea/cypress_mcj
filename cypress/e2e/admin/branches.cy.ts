@@ -136,11 +136,7 @@ describe("Manajemen Cabang (Admin)", () => {
 
       // 2. Klik halaman 2
       // PERBAIKAN: Cari tombol "2" di sebelah teks paginasi
-      cy.contains(paginationText)
-        .next() // Pindah ke div pembungkus paginasi
-        .find("button") // Cari tombol di dalamnya
-        .contains("2") // Cari yang teksnya "2"
-        .click();
+      cy.contains(paginationText).next().find("button").contains("2").click();
 
       // 3. Pastikan data halaman 1 hilang
       cy.contains("ICBP-Noodle Head Office").should("not.exist");
@@ -150,11 +146,10 @@ describe("Manajemen Cabang (Admin)", () => {
       cy.contains(newPaginationText).should("be.visible");
 
       // 5. Klik halaman 1 (kembali)
-      // PERBAIKAN: Cari tombol "1" di sebelah teks paginasi
       cy.contains(newPaginationText)
-        .next() // Pindah ke div pembungkus paginasi
-        .find("button") // Cari tombol di dalamnya
-        .contains("1") // Cari yang teksnya "1"
+        .next()
+        .find("button")
+        .contains("1")
         .click();
 
       // 6. Pastikan data halaman 1 muncul kembali
