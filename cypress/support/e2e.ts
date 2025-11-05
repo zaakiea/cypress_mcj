@@ -14,4 +14,19 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
+Cypress.on("uncaught:exception", (err, runnable) => {
+  // Kita return false di sini untuk mencegah
+  // Cypress menggagalkan tes secara otomatis
+  // jika error-nya adalah 'ResizeObserver'
+  if (
+    err.message.includes(
+      "ResizeObserver loop completed with undelivered notifications"
+    )
+  ) {
+    return false;
+  }
+
+  // Biarkan error lain yang tidak terkait tetap menggagalkan tes
+  return true;
+});
