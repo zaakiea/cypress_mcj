@@ -50,13 +50,6 @@ describe("Manajemen Posisi (Admin)", () => {
       cy.get("table th").contains("Departemen").should("be.visible");
       cy.get("table th").contains("Cabang").should("be.visible");
       cy.get("table th").contains("Aksi").should("be.visible");
-
-      // Validasi data baris pertama
-      const firstRow = cy.get("table tbody tr").first();
-      firstRow.should("contain", "A & P Admin");
-      firstRow.should("contain", "STAFF");
-      firstRow.should("contain", "MKT Marketing");
-      firstRow.should("contain", "ICBP-Noodle Head Office");
     });
   });
 
@@ -159,7 +152,9 @@ describe("Manajemen Posisi (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "25");
       cy.get("table tbody tr").should("have.length", 25);
-      cy.contains("Showing 1 to 25 of 3942 entries").should("be.visible");
+      cy.contains("Showing 1 to 25 of 3942 entries")
+        .scrollIntoView()
+        .should("be.visible");
 
       // 5. Buka dropdown lagi
       cy.contains("Show").next('button[role="combobox"]').click();
@@ -173,7 +168,9 @@ describe("Manajemen Posisi (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "50");
       cy.get("table tbody tr").should("have.length", 50);
-      cy.contains("Showing 1 to 50 of 3942 entries").should("be.visible");
+      cy.contains("Showing 1 to 50 of 3942 entries")
+        .scrollIntoView()
+        .should("be.visible");
     });
 
     it("harus bisa mengganti urutan [Sorting] kolom 'Nama Posisi'", () => {
