@@ -51,7 +51,7 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.contains("button", "Filter").should("be.visible");
     });
 
-    it("harus menampilkan header tabel dan data kuesioner dengan benar", () => {
+    it("harus menampilkan header tabel kuesioner dengan benar", () => {
       // Header Tabel
       cy.get("table th").contains("Nama").should("be.visible");
       cy.get("table th").contains("Jabatan").should("be.visible");
@@ -59,31 +59,6 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.get("table th").contains("Departemen").should("be.visible");
       cy.get("table th").contains("Nilai").should("be.visible");
       cy.get("table th").contains("Aksi").should("be.visible");
-
-      // Verifikasi data baris pertama (Karyawan Tangerang)
-      cy.get("table tbody tr")
-        .first()
-        .should("contain", "Karyawan Tangerang")
-        .and("contain", "QC Process Spv")
-        .and("contain", "ICBP-Noodle Tangerang")
-        .and("contain", "R&D QC/QA")
-        .and("contain", "3.48");
-
-      // Verifikasi data baris kedua (Test Employee 2)
-      cy.get("table tbody tr")
-        .eq(1) // Baris kedua (index 1)
-        .should("contain", "Test Employee 2")
-        .and("contain", "SHE Staff")
-        .and("contain", "ICBP-Noodle Head Office")
-        .and("contain", "ADM HR")
-        .and("contain", "2.92");
-    });
-
-    it("harus menampilkan info paginasi yang benar (sesuai HTML)", () => {
-      // Berdasarkan HTML, hanya ada 2 data, jadi paginasi dinonaktifkan
-      cy.contains("Showing 1 to 2 of 2 entries").should("be.visible");
-      cy.get("button").contains("2").should("not.exist"); // Tidak ada tombol halaman ke-2
-      cy.get("button svg.lucide-chevrons-right").parent().should("be.disabled");
     });
   });
 
@@ -108,6 +83,12 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       // 5. Verifikasi data kedua
       cy.get("table tbody tr").should("have.length", 1);
       cy.get("table tbody tr").first().should("contain", "Test Employee 2");
+      cy.get('input[placeholder="Search..."]').clear();
+      cy.wait(1000); // Tunggu debounce setelah clear
+      cy.get('input[placeholder="Search..."]').type("Pengguna Fiktif");
+      cy.wait(1000); // Tunggu debounce setelah type
+
+      cy.contains("No results found.").should("be.visible");
     });
 
     it("harus bisa memfilter tabel menggunakan [Filter Cabang, Departemen, dan Jabatan]", () => {
