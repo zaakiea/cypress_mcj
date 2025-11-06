@@ -330,4 +330,254 @@ describe("Admin - Manajemen Data Karyawan", () => {
       cy.contains("td", "Aan Andriani").should("be.visible");
     });
   });
+  // --- GRUP 3: Validasi Fungsionalitas CRUD (Create, Update, Delete) ---
+  describe("Validasi Fungsionalitas CRUD (Create, Update, Delete)", () => {
+    // Data yang akan digunakan untuk pengetesan
+    const testData = {
+      nama: "Test Karyawan 1",
+      id: "210100",
+      gender: "MALE", // Mapping "Laki-laki" ke "MALE" sesuai HTML
+      tglLahir: "2000-01-01", // Format YYYY-MM-DD untuk input[type="date"]
+      tglMasuk: "2023-01-01", // Format YYYY-MM-DD
+      pendidikan: "S1",
+      universitas: "Test University",
+      jurusan: "Teknik Komputer",
+      cabang: "ICBP-Noodle Semarang",
+      departemen: "MKT Marketing",
+      posisi: "A & P Staff",
+      level: "STAFF",
+    };
+    const namaEdit = "Test Karyawan 1 (Edited)";
+
+    // Helper untuk memilih opsi dropdown kustom (combobox)
+    const selectDropdownOption = (label: string, optionText: string) => {
+      cy.get('div[role="dialog"]').within(() => {
+        cy.contains("label", label)
+          .next('button[role="combobox"]')
+          .click({ force: true }); // Gunakan force jika ada elemen lain yg menghalangi
+      });
+      // Opsi dropdown muncul di root body
+      cy.get('div[role="option"]').contains(optionText).click();
+    };
+
+    it("harus bisa menambah data karyawan baru", () => {
+      // 1. Intercept API call
+      cy.intercept("POST", "/api/admin/employees").as("createEmployee");
+      cy.intercept("GET", "/api/admin/employees?*").as(
+        "getEmployeesAfterCreate"
+      );
+
+      // 2. Klik tombol Tambah Karyawan
+      cy.contains("button", "Tambah Karyawan").click();
+
+      // 3. Pastikan modal muncul
+      cy.get('div[role="dialog"]')
+        .contains("h2", "Tambah Karyawan Baru")
+        .should("be.visible");
+
+      // 4. Isi form di dalam modal
+      cy.get('div[role="dialog"]').within(() => {
+        cy.get('input[name="fullName"]').type(testData.nama);
+        cy.get('input[name="employeeId"]').type(testData.id);
+        cy.get('input[name="dateOfBirth"]').type(testData.tglLahir);
+        cy.get('input[name="hireDate"]').type(testData.tglMasuk);
+        cy.get('input[name="lastEducationSchool"]').type(testData.universitas);
+        cy.get('input[name="lastEducationMajor"]').type(testData.jurusan);
+      });
+
+      // 5. Isi semua dropdown (combobox)
+      // (Fungsi helper dipanggil di luar .within() karena dropdown option ada di body)
+      selectDropdownOption("Jenis Kelamin", testData.gender);
+      selectDropdownOption("Pendidikan Terakhir", testData.pendidikan);
+      selectDropdownOption("Cabang", testData.cabang);
+
+      cy.wait(500); // Tunggu departemen load
+      selectDropdownOption("Departemen", testData.departemen);
+
+      cy.wait(500); // Tunggu posisi load
+      selectDropdownOption("Posisi", testData.posisi);
+
+      selectDropdownOption("Level", testData.level);
+
+      // 6. Klik Simpan
+      cy.get('div[role="dialog"]').within(() => {
+        cy.contains("button", "Simpan").click();
+      });
+
+      // 7. Verifikasi sukses (sesuai permintaan Anda)
+      cy.wait("@createEmployee");
+      // *** FIX: Gunakan selector spesifik untuk toast sukses ***
+      cy.get('li[data-sonner-toast][data-type="success"]')
+        .should("contain", "Karyawan berhasil dibuat")
+        .should("be.visible");
+      cy.wait("@getEmployeesAfterCreate");
+
+      // 8. Verifikasi data baru ada di tabel (cek melalui pencarian)
+      cy.get('input[placeholder="Search..."]').type(testData.id);
+      cy.wait(500);
+      cy.get("table tbody").contains("td", testData.nama).should("be.visible");
+      cy.get("table tbody")
+        .contains("td", testData.posisi)
+        .should("be.visible");
+
+      // 9. Bersihkan search
+      cy.get('input[placeholder="Search..."]').clear();
+    });
+    it("harus gagal menambah data karyawan jika ID sudah ada", () => {
+      // 1. Intercept API call
+      cy.intercept("POST", "/api/admin/employees").as(
+        "createDuplicateEmployee"
+      );
+
+      // 2. Klik tombol Tambah Karyawan
+      cy.contains("button", "Tambah Karyawan").click();
+
+      // 3. Pastikan modal muncul
+      cy.get('div[role="dialog"]')
+        .contains("h2", "Tambah Karyawan Baru")
+        .should("be.visible");
+
+      // 4. Isi form di dalam modal dengan ID yang sama
+      // Gunakan nama yang berbeda untuk membedakan, tapi ID yang sama
+      const duplicateName = testData.nama + " Duplikat";
+      cy.get('div[role="dialog"]').within(() => {
+        cy.get('input[name="fullName"]').type(duplicateName);
+        cy.get('input[name="employeeId"]').type(testData.id); // <-- ID yang sama
+        cy.get('input[name="dateOfBirth"]').type(testData.tglLahir);
+        cy.get('input[name="hireDate"]').type(testData.tglMasuk);
+        cy.get('input[name="lastEducationSchool"]').type(testData.universitas);
+        cy.get('input[name="lastEducationMajor"]').type(testData.jurusan);
+      });
+
+      // 5. Isi semua dropdown (combobox)
+      selectDropdownOption("Jenis Kelamin", testData.gender);
+      selectDropdownOption("Pendidikan Terakhir", testData.pendidikan);
+      selectDropdownOption("Cabang", testData.cabang);
+
+      cy.wait(500); // Tunggu departemen load
+      selectDropdownOption("Departemen", testData.departemen);
+
+      cy.wait(500); // Tunggu posisi load
+      selectDropdownOption("Posisi", testData.posisi);
+
+      selectDropdownOption("Level", testData.level);
+
+      // 6. Klik Simpan
+      cy.get('div[role="dialog"]').within(() => {
+        cy.contains("button", "Simpan").click();
+      });
+
+      // 7. Verifikasi error
+      cy.wait("@createDuplicateEmployee");
+      // Asumsi: Toast error akan muncul
+      cy.get('li[data-sonner-toast][data-type="error"]')
+        .should("contain", "ID Karyawan sudah digunakan.") // Asumsi pesan error
+        .should("exist");
+
+      // 8. Pastikan modal masih terbuka
+      cy.get('div[role="dialog"]')
+        .contains("h2", "Tambah Karyawan Baru")
+        .should("be.visible");
+
+      // 9. Tutup modal untuk cleanup
+      cy.get('div[role="dialog"]').within(() => {
+        // Klik tombol Batal atau tombol Close [X]
+        cy.get('button[data-slot="dialog-close"]').click();
+      });
+
+      cy.get('div[role="dialog"]').should("not.exist");
+    });
+    it("harus bisa mengedit data karyawan", () => {
+      // 1. Intercept API call (Asumsi ID Karyawan ada di URL)
+      cy.intercept("PUT", `/api/admin/employees/${testData.id}`).as(
+        "updateEmployee"
+      );
+      cy.intercept("GET", "/api/admin/employees?*").as(
+        "getEmployeesAfterUpdate"
+      );
+
+      // 2. Cari data yang baru dibuat
+      cy.get('input[placeholder="Search..."]').type(testData.id);
+      cy.wait(1000); // Tunggu tabel update
+
+      // 3. Klik tombol edit pada baris tersebut
+      cy.contains("tr", testData.nama)
+        .find("button.hover\\:text-primary") // Tombol Edit
+        .click();
+
+      // 4. Pastikan modal edit muncul
+      cy.get('div[role="dialog"]')
+        .contains("h2", "Edit Karyawan")
+        .should("be.visible");
+
+      // 5. Verifikasi ID tidak bisa diubah dan benar
+      cy.get('input[name="employeeId"]')
+        .should("have.value", testData.id)
+        .and("be.disabled");
+
+      // 6. Ubah data (contoh: Nama Lengkap)
+      cy.get('input[name="fullName"]').clear().type(namaEdit);
+
+      // 7. Klik Simpan
+      cy.get('div[role="dialog"]').within(() => {
+        cy.contains("button", "Simpan").click();
+      });
+
+      // 8. Verifikasi sukses
+      cy.wait("@updateEmployee");
+      cy.get('li[data-sonner-toast][data-type="success"]')
+        .should("contain", "Karyawan berhasil diperbarui") // Asumsi pesan sukses
+        .should("be.visible");
+      cy.wait("@getEmployeesAfterUpdate");
+
+      // 9. Verifikasi data telah berubah di tabel
+      cy.get("table tbody").contains("td", namaEdit).should("be.visible");
+
+      // 10. Bersihkan search
+      cy.get('input[placeholder="Search..."]').clear();
+    });
+
+    it("harus bisa menghapus data karyawan", () => {
+      // 1. Intercept API call
+      cy.intercept("DELETE", `/api/admin/employees/${testData.id}`).as(
+        "deleteEmployee"
+      );
+      cy.intercept("GET", "/api/admin/employees?*").as(
+        "getEmployeesAfterDelete"
+      );
+
+      // 2. Cari data yang baru diedit
+      cy.get('input[placeholder="Search..."]').type(testData.id);
+      cy.wait(1000); // Tunggu tabel update
+
+      // 3. Klik tombol hapus pada baris tersebut
+      cy.contains("tr", namaEdit)
+        .find("button.hover\\:text-red-600") // Tombol Hapus
+        .click();
+
+      // 4. Pastikan dialog konfirmasi muncul
+      cy.get('div[role="alertdialog"]')
+        .contains("h2", "Apakah Anda yakin?")
+        .should("be.visible");
+      cy.get('div[role="alertdialog"]')
+        .contains(`Tindakan ini akan menghapus karyawan: ${namaEdit}`)
+        .should("be.visible");
+
+      // 5. Klik tombol "Hapus" (konfirmasi)
+      cy.get('div[role="alertdialog"]').contains("button", "Hapus").click();
+
+      // 6. Verifikasi sukses
+      cy.wait("@deleteEmployee");
+      cy.get('li[data-sonner-toast][data-type="success"]')
+        .should("contain", "Karyawan berhasil dihapus") // Asumsi pesan sukses
+        .should("be.visible");
+      cy.wait("@getEmployeesAfterDelete");
+
+      // 7. Verifikasi data hilang dari tabel
+      cy.contains("No results found.").should("be.visible");
+
+      // 8. Bersihkan search
+      cy.get('input[placeholder="Search..."]').clear();
+    });
+  });
 });

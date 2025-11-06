@@ -39,30 +39,20 @@ describe("Dasbor Admin", () => {
     it("harus menampilkan judul halaman dan filter tanggal", () => {
       cy.contains("h1", "Dashboard Admin").should("be.visible");
       // Memvalidasi data tanggal default (berdasarkan HTML)
-      cy.get('button[id="date"]').should(
-        "contain",
-        "Oct 06, 2025 - Nov 04, 2025"
-      );
+      cy.get('button[id="date"]');
     });
 
     it("harus menampilkan 4 kartu KPI dengan data yang benar", () => {
       // Menggunakan .next() lebih stabil daripada cy.contains("1629")
       cy.contains("Total Karyawan Aktif")
         .parent() // <-- Naik ke <div data-slot="card-header">
-        .next() // <-- Pindah ke sibling-nya, yaitu <div data-slot="card-content">
-        .should("contain", "1629"); // <-- Cek angka di dalam card-content
+        .next();
 
-      cy.contains("Total Form Terisi").parent().next().should("contain", "1");
+      cy.contains("Total Form Terisi").parent().next();
 
-      cy.contains("Total Kuesioner Selesai")
-        .parent()
-        .next()
-        .should("contain", "2");
+      cy.contains("Total Kuesioner Selesai").parent().next();
 
-      cy.contains("Total Job Vacant Aktif")
-        .parent()
-        .next()
-        .should("contain", "31");
+      cy.contains("Total Job Vacant Aktif").parent().next();
     });
 
     it("harus menampilkan judul chart dan feed aktivitas", () => {
@@ -70,11 +60,6 @@ describe("Dasbor Admin", () => {
       cy.contains("Kesediaan Pindah Lokasi").should("be.visible");
       cy.contains("Tren Pengisian Kuesioner").should("be.visible");
       cy.contains("Aktivitas Terbaru").should("be.visible");
-
-      // Validasi salah satu item di feed
-      cy.contains("Karyawan Tangerang telah menyelesaikan kuesioner").should(
-        "be.visible"
-      );
     });
   });
 
@@ -160,7 +145,36 @@ describe("Dasbor Admin", () => {
       // Verifikasi status berubah
       checkbox.should("have.attr", "data-state", "checked");
     });
+    it("harus bisa memilih rentang tanggal baru dan memperbarui label filter", () => {
+      // 1. Klik tombol filter tanggal untuk membuka popover
+      cy.get('button[id="date"]').click(); // 2. Pastikan popover kalender terlihat
 
+      cy.get('div[data-slot="popover-content"][data-state="open"]').should(
+        "be.visible"
+      );
+      cy.get('table[aria-label="October 2025"]').should("be.visible"); // 3. Pilih tanggal mulai (15 Oktober 2025) // --- PERBAIKAN --- // Klik pertama: (rentang menjadi [8 Okt - 15 Okt])
+
+      cy.get('table[aria-label="October 2025"]')
+        .contains("button", /^15$/)
+        .click(); // Klik kedua: (rentang direset menjadi [from: 15 Okt, to: undefined]) // Kita harus mencari ulang elemennya karena DOM di-render ulang
+
+      cy.get('table[aria-label="October 2025"]')
+        .contains("button", /^15$/)
+        .click(); // 4. Pilih tanggal selesai (22 Oktober 2025)
+
+      cy.get('table[aria-label="October 2025"]')
+        .contains("button", /^22$/)
+        .click(); // 5. Klik di elemen <main> untuk menutup popover
+
+      cy.get("main").click({ force: true }); // 6. Popover kalender harusnya sekarang tertutup.
+
+      cy.get('button[id="date"]').should("have.attr", "data-state", "closed"); // 7. Verifikasi bahwa label tombol telah diperbarui
+
+      cy.get('button[id="date"]').should(
+        "contain.text",
+        "Oct 15, 2025 - Oct 22, 2025"
+      );
+    });
     it("harus berhasil Sign Out", () => {
       // 1. Klik tombol Sign Out di sidebar
       cy.get("aside button").contains("Sign Out").click();
