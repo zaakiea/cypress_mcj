@@ -211,8 +211,8 @@ describe("Dasbor Admin", () => {
       lastChartTitle.should("be.visible");
 
       // 4. Validasi data di dalam chart tersebut
-      cy.contains("R&D QC/QA").should("be.visible");
       cy.contains("ADM HR").should("be.visible");
+      cy.contains("MFG").should("be.visible");
     });
   });
 

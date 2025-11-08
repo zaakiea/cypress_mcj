@@ -1,10 +1,8 @@
 // cypress/e2e/admin/user-management.cy.ts
 describe("Manajemen Pengguna (Admin)", () => {
   beforeEach(() => {
-    // 1. Kunjungi halaman login
     cy.visit("/login");
 
-    // 2. Ambil data login admin
     const adminId = Cypress.env("TEST_ADMIN_ID");
     const adminPassword = Cypress.env("TEST_ADMIN_PASSWORD");
 
@@ -12,14 +10,11 @@ describe("Manajemen Pengguna (Admin)", () => {
     cy.get('input[id="password"]').type(adminPassword);
     cy.get('button[type="submit"]').click();
 
-    // 4. Pastikan sudah di dashboard admin
     cy.url({ timeout: 10000 }).should("include", "/admin");
     cy.contains("h1", "Dashboard Admin").should("be.visible");
 
-    // 5. Navigasi ke halaman Manajemen Pengguna
     cy.get('a[href="/admin/users"]').click();
 
-    // 6. Pastikan halaman selesai loading
     cy.contains("h1", "Manajemen Pengguna").should("be.visible");
   });
 
@@ -56,14 +51,14 @@ describe("Manajemen Pengguna (Admin)", () => {
   describe("Validasi Fungsionalitas (Interactions)", () => {
     it("harus bisa memfilter tabel menggunakan [Search]", () => {
       // 1. Cari data unik (case-insensitive)
-      cy.get('input[placeholder="Search..."]').type("hr cabang dki");
+      cy.get('input[placeholder="Search..."]').type("hr cabang head office");
       cy.wait(1000); // Tunggu debounce (750ms)
 
       // 2. Pastikan hanya data yang dicari yang muncul
       cy.get("table tbody tr").should("have.length", 1);
       cy.get("table tbody tr")
         .first()
-        .should("contain", "HR001DKI")
+        .should("contain", "HR001HO")
         .and("contain", "HR_BRANCH");
 
       // 3. Pastikan data lain hilang
@@ -85,7 +80,7 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "10");
       cy.get("table tbody tr").should("have.length", 10);
-      cy.contains("Showing 1 to 10 of 1632 entries").should("be.visible");
+      cy.contains("Showing 1 to 10 of 81 entries").should("be.visible");
 
       // 2. Buka dropdown
       cy.contains("Show").next('button[role="combobox"]').click();
@@ -99,7 +94,7 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "25");
       cy.get("table tbody tr").should("have.length", 25);
-      cy.contains("Showing 1 to 25 of 1632 entries")
+      cy.contains("Showing 1 to 25 of 81 entries")
         .scrollIntoView()
         .should("be.visible");
 
@@ -115,13 +110,13 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "50");
       cy.get("table tbody tr").should("have.length", 50);
-      cy.contains("Showing 1 to 50 of 1632 entries")
+      cy.contains("Showing 1 to 50 of 81 entries")
         .scrollIntoView()
         .should("be.visible");
     });
 
     it("harus bisa berpindah halaman menggunakan [Paginasi]", function () {
-      const paginationText = "Showing 1 to 10 of 1632 entries";
+      const paginationText = "Showing 1 to 10 of 81 entries";
       cy.contains(paginationText).should("be.visible");
 
       // 1. Klik halaman 2
@@ -133,10 +128,16 @@ describe("Manajemen Pengguna (Admin)", () => {
       cy.wait(1000); // Tunggu data reload
 
       // 2. Cek teks paginasi baru
-      cy.contains("Showing 11 to 20 of 1632 entries").should("be.visible");
+      cy.contains("Showing 11 to 20 of 81 entries").should("be.visible");
 
-      // 3. Pastikan data baris pertama Halaman 1 sudah tidak ada
-      cy.contains("123789").should("not.exist");
+      // 3. Klik halaman terakhir (234 entries / 10 = 24 pages)
+      cy.get("button svg.lucide-chevrons-right").parent().click();
+      cy.contains("Showing 81 to 81 of 81 entries").should("be.visible");
+
+      // 4. Klik halaman pertama
+      cy.get("button svg.lucide-chevrons-left").parent().click();
+      cy.contains(paginationText).should("be.visible");
+      cy.get("table tbody tr").first().should("contain", "Head Office");
     });
   });
   // --- GRUP 3: Skenario Edit Peran (Sesuai Permintaan) ---

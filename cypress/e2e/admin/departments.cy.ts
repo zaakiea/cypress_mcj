@@ -66,7 +66,6 @@ describe("Manajemen Departemen (Admin)", () => {
       // 1. Cari data spesifik (case-insensitive)
       cy.get('input[placeholder="Search..."]').type("adm fin");
 
-      // --- PERBAIKAN: Tunggu lebih lama dari debounce (750ms) ---
       cy.wait(1000); // Tunggu 1 detik agar aman
 
       // 2. Pastikan hanya data yang dicari yang muncul
@@ -140,7 +139,9 @@ describe("Manajemen Departemen (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "25");
       cy.get("table tbody tr").should("have.length", 25);
-      cy.contains("Showing 1 to 25 of 234 entries").should("be.visible");
+      cy.contains("Showing 1 to 25 of 234 entries")
+        .scrollIntoView()
+        .should("be.visible");
 
       // 5. Buka dropdown lagi
       cy.contains("Show").next('button[role="combobox"]').click();
@@ -154,7 +155,9 @@ describe("Manajemen Departemen (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "50");
       cy.get("table tbody tr").should("have.length", 50);
-      cy.contains("Showing 1 to 50 of 234 entries").should("be.visible");
+      cy.contains("Showing 1 to 50 of 234 entries")
+        .scrollIntoView()
+        .should("be.visible");
     });
 
     it("harus bisa mengganti urutan [Sorting] kolom 'Nama Departemen' dan tabel berubah", () => {

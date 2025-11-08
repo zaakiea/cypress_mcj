@@ -44,7 +44,7 @@ describe("Manajemen Posisi (Admin)", () => {
       cy.contains("button", "Buat Posisi").should("be.visible");
     });
 
-    it("harus menampilkan header tabel dan data baris pertama", () => {
+    it("harus menampilkan header tabel", () => {
       cy.get("table th").contains("Nama Posisi").should("be.visible");
       cy.get("table th").contains("Level").should("be.visible");
       cy.get("table th").contains("Departemen").should("be.visible");
