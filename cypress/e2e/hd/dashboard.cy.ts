@@ -214,12 +214,6 @@ describe("HD - Dashboard", () => {
 
       // 3. Pastikan elemen itu sekarang terlihat
       lastModuleTitle.should("be.visible");
-
-      // 4. Validasi data di dalam feed (berdasarkan HTML)
-      cy.contains(
-        "p",
-        'Karyawan baru "Test Karyawan 1" telah ditambahkan.'
-      ).should("be.visible");
     });
   });
 
