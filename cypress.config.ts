@@ -8,7 +8,7 @@ dotenv.config();
 
 export default defineConfig({
   e2e: {
-    baseUrl: "https://dev.mycareerjourney.my.id",
+    baseUrl: "http://localhost:3000",
     setupNodeEvents(on, config) {
       // implement node event listeners
       //  here

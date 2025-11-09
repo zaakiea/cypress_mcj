@@ -8,12 +8,12 @@ describe("Formulir Data Diri - Skenario Pengisian Lengkap", () => {
   beforeEach(() => {
     // 1. Ambil NIP/ID Karyawan dari .env
     // Gunakan SATU variabel ini untuk semuanya
-    const testEmployeeNip = Cypress.env("TEST_EMPLOYEE_ID");
-    const testEmployeePassword = Cypress.env("TEST_EMPLOYEE_PASSWORD");
+    const testEmployeeNip = Cypress.env("TEST_EMPLOYEE2_ID");
+    const testEmployeePassword = Cypress.env("TEST_EMPLOYEE2_PASSWORD");
 
     if (!testEmployeeNip || !testEmployeePassword) {
       throw new Error(
-        "TEST_EMPLOYEE_ID dan TEST_EMPLOYEE_PASSWORD harus ada di cypress.env.json"
+        "TEST_EMPLOYEE2_ID dan TEST_EMPLOYEE2_PASSWORD harus ada di cypress.env.json"
       );
     }
 
