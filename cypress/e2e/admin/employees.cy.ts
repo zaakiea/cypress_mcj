@@ -59,7 +59,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       cy.get("table tbody tr").should("have.length", 10);
       // Verifikasi total entri dari HTML Data Karyawan
-      cy.contains("Showing 1 to 10 of 81 entries").should("be.visible");
+      cy.contains("Showing 1 to 10 of 88 entries").should("be.visible");
 
       // 2. Buka dropdown
       cy.get("@selectShow").click();
@@ -73,7 +73,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       // Asumsi API mengembalikan 25 baris
       cy.get("table tbody tr").should("have.length", 25);
       // Verifikasi info paginasi diperbarui
-      cy.contains("Showing 1 to 25 of 81 entries")
+      cy.contains("Showing 1 to 25 of 88 entries")
         .scrollIntoView()
         .should("be.visible");
 
@@ -89,7 +89,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       // Asumsi API mengembalikan 50 baris
       cy.get("table tbody tr").should("have.length", 50);
       // Verifikasi info paginasi diperbarui
-      cy.contains("Showing 1 to 50 of 81 entries")
+      cy.contains("Showing 1 to 50 of 88 entries")
         .scrollIntoView()
         .should("be.visible");
     });
@@ -157,7 +157,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
     it("harus bisa berpindah halaman menggunakan [Paginasi]", () => {
       // (Data dari HTML Data Karyawan: 1632 entries)
-      const initialPaginationText = "Showing 1 to 10 of 81 entries";
+      const initialPaginationText = "Showing 1 to 10 of 88 entries";
 
       // 1. Verifikasi status awal (Halaman 1)
       cy.log("State 1: Verifikasi Halaman 1");
@@ -178,7 +178,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       // 3. Verifikasi status Halaman 2
       cy.log("State 3: Verifikasi Halaman 2");
-      cy.contains("Showing 11 to 20 of 81 entries").should("be.visible");
+      cy.contains("Showing 11 to 20 of 88 entries").should("be.visible");
       // --- PERBAIKAN ---
       cy.contains("button", /^2$/).should("have.class", "bg-primary");
       cy.contains("button", /^1$/).should("not.have.class", "bg-primary");
@@ -194,7 +194,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       // 5. Verifikasi Halaman Terakhir
       cy.log("State 5: Verifikasi Halaman Terakhir (Halaman 164)");
-      cy.contains("Showing 81 to 81 of 81 entries").should("be.visible");
+      cy.contains("Showing 81 to 88 of 88 entries").should("be.visible");
       cy.get("button svg.lucide-chevrons-right").parent().should("be.disabled");
       cy.get("button svg.lucide-chevrons-left")
         .parent()
@@ -305,8 +305,8 @@ describe("Admin - Manajemen Data Karyawan", () => {
     });
 
     it("harus menampilkan dialog konfirmasi [Hapus] saat tombol Aksi Hapus diklik", () => {
-      // 1. Cari baris untuk karyawan "Andi Setiawan"
-      cy.contains("tr", "Andi Setiawan")
+      // 1. Cari baris untuk karyawan
+      cy.contains("tr", "Ahmad Yulianto")
         .find("button.hover\\:text-red-600") // Selector untuk tombol hapus
         .click();
 
@@ -315,7 +315,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
         cy.contains("h2", "Apakah Anda yakin?").should("be.visible");
         cy.contains(
           "p",
-          "Tindakan ini akan menghapus karyawan: Andi Setiawan."
+          "Tindakan ini akan menghapus karyawan: Ahmad Yulianto."
         ).should("be.visible");
 
         // 3. Klik batal untuk menutup dialog
@@ -324,7 +324,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       // 4. Pastikan dialog hilang dan data masih ada
       cy.get('div[role="alertdialog"]').should("not.exist");
-      cy.contains("td", "Andi Setiawan").should("be.visible");
+      cy.contains("td", "Ahmad Yulianto").should("be.visible");
     });
   });
   // --- GRUP 3: Validasi Fungsionalitas CRUD (Create, Update, Delete) ---

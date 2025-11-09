@@ -65,24 +65,24 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
   // --- GRUP 2: Validasi Fungsionalitas (Interactions) ---
   describe("Validasi Fungsionalitas (Interactions)", () => {
     it("harus bisa memfilter tabel menggunakan [Search]", () => {
-      // 1. Cari data spesifik (Karyawan Tangerang)
-      cy.get('input[placeholder="Search..."]').type("Karyawan Tangerang");
+      // 1. Cari data spesifik
+      cy.get('input[placeholder="Search..."]').type("Ahmad Fauzan");
       cy.wait(500); // Tunggu debounce/network
 
       // 2. Pastikan hanya data yang dicari yang muncul
       cy.get("table tbody tr").should("have.length", 1);
-      cy.get("table tbody tr").first().should("contain", "Karyawan Tangerang");
+      cy.get("table tbody tr").first().should("contain", "Ahmad Fauzan");
 
       // 3. Pastikan data lain hilang
       cy.contains("Test Employee 2").should("not.exist");
 
       // 4. Hapus pencarian dan cari data kedua
-      cy.get('input[placeholder="Search..."]').clear().type("ADM HR");
+      cy.get('input[placeholder="Search..."]').clear().type("ADM Fin.& Acct.");
       cy.wait(500);
 
       // 5. Verifikasi data kedua
       cy.get("table tbody tr").should("have.length", 1);
-      cy.get("table tbody tr").first().should("contain", "Test Employee 2");
+      cy.get("table tbody tr").first().should("contain", "Ahmad Fauzan");
       cy.get('input[placeholder="Search..."]').clear();
       cy.wait(1000); // Tunggu debounce setelah clear
       cy.get('input[placeholder="Search..."]').type("Pengguna Fiktif");
@@ -114,8 +114,8 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
           .click();
       });
 
-      // 6. Pilih (ADM HR) - Sesuai data 'Test Employee 2'
-      cy.get('div[role="option"]').contains("ADM HR").click();
+      // 6. Pilih Sesuai data 'Test Employee 2'
+      cy.get('div[role="option"]').contains("ADM Fin.& Acct.").click();
 
       // 7. Terapkan filter [Jabatan] (Filter tambahan)
       cy.get('div[role="dialog"]').within(() => {
@@ -124,8 +124,8 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
           .click();
       });
 
-      // 8. Pilih (SHE Staff) - Sesuai data 'Test Employee 2'
-      cy.get('div[role="option"]').contains("SHE Staff").click();
+      // 8. Pilih Finance Staff
+      cy.get('div[role="option"]').contains("Finance Staff").click();
 
       // 9. Klik Terapkan
       cy.get('div[role="dialog"]').within(() => {
@@ -135,10 +135,9 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.wait(500); // Tunggu data reload
 
       // 10. Verifikasi semua data di tabel
-      // Hanya 1 baris (Test Employee 2) yang boleh muncul
       cy.get("table tbody tr").should("have.length", 1);
-      cy.contains("td", "Test Employee 2").should("be.visible");
-      cy.contains("td", "Karyawan Tangerang").should("not.exist");
+      cy.contains("td", "Ahmad Fauzan").should("be.visible");
+      cy.contains("td", "Test Karyawan 2").should("not.exist");
 
       // Verifikasi lebih detail per kolom
       cy.get("table tbody tr").each(($row) => {
@@ -147,9 +146,9 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
         // 1: Jabatan
         // 2: Cabang
         // 3: Departemen
-        cy.wrap($row).find("td").eq(1).should("contain", "SHE Staff");
+        cy.wrap($row).find("td").eq(1).should("contain", "Finance Staff");
         cy.wrap($row).find("td").eq(2).should("contain", "Head Office");
-        cy.wrap($row).find("td").eq(3).should("contain", "ADM HR");
+        cy.wrap($row).find("td").eq(3).should("contain", "ADM Fin.& Acct.");
       });
 
       // 11. Tombol filter harus terlihat aktif (berwarna biru)
@@ -165,9 +164,10 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.contains("button", "Filter").should("have.class", "border");
 
       // 14. Verifikasi data kembali seperti semula
-      cy.get("table tbody tr").should("have.length.gte", 2);
-      cy.contains("td", "Karyawan Tangerang").should("be.visible");
-      cy.contains("td", "Test Employee 2").should("be.visible");
+      cy.get("table tbody tr").should("have.length.gte", 4);
+      cy.contains("td", "Test Karyawan 1").should("be.visible");
+      cy.contains("td", "Test Karyawan 2").should("be.visible");
+      cy.contains("td", "Test Karyawan 3").should("be.visible");
     });
 
     it('harus bisa mengganti urutan [Sorting] kolom "Nama"', () => {
@@ -175,8 +175,8 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.get("table th").contains("Nama").as("headerNama");
 
       // Simpan data awal
-      const firstRowText = "Karyawan Tangerang";
-      const secondRowText = "Test Employee 2";
+      const firstRowText = "Ahmad Fauzan";
+      const secondRowText = "Test Karyawan 3";
 
       // --- PERBAIKAN 1: Verifikasi Status Awal (Ascending) ---
       // Berdasarkan HTML, status awal adalah 'arrow-up' (Ascending)
@@ -235,8 +235,8 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
     });
 
     it("harus bernavigasi ke halaman detail saat tombol [Aksi] diklik", () => {
-      // 1. Cari baris untuk 'Karyawan Tangerang'
-      cy.contains("td", "Karyawan Tangerang")
+      // 1. Cari baris
+      cy.contains("td", "Ahmad Fauzan")
         .parent("tr")
         .find("td")
         .last() // Dapatkan sel 'Aksi'

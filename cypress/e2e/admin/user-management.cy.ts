@@ -80,7 +80,7 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "10");
       cy.get("table tbody tr").should("have.length", 10);
-      cy.contains("Showing 1 to 10 of 81 entries").should("be.visible");
+      cy.contains("Showing 1 to 10 of 88 entries").should("be.visible");
 
       // 2. Buka dropdown
       cy.contains("Show").next('button[role="combobox"]').click();
@@ -94,7 +94,7 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "25");
       cy.get("table tbody tr").should("have.length", 25);
-      cy.contains("Showing 1 to 25 of 81 entries")
+      cy.contains("Showing 1 to 25 of 88 entries")
         .scrollIntoView()
         .should("be.visible");
 
@@ -110,13 +110,13 @@ describe("Manajemen Pengguna (Admin)", () => {
         .next('button[role="combobox"]')
         .should("contain", "50");
       cy.get("table tbody tr").should("have.length", 50);
-      cy.contains("Showing 1 to 50 of 81 entries")
+      cy.contains("Showing 1 to 50 of 88 entries")
         .scrollIntoView()
         .should("be.visible");
     });
 
     it("harus bisa berpindah halaman menggunakan [Paginasi]", function () {
-      const paginationText = "Showing 1 to 10 of 81 entries";
+      const paginationText = "Showing 1 to 10 of 88 entries";
       cy.contains(paginationText).should("be.visible");
 
       // 1. Klik halaman 2
@@ -128,11 +128,11 @@ describe("Manajemen Pengguna (Admin)", () => {
       cy.wait(1000); // Tunggu data reload
 
       // 2. Cek teks paginasi baru
-      cy.contains("Showing 11 to 20 of 81 entries").should("be.visible");
+      cy.contains("Showing 11 to 20 of 88 entries").should("be.visible");
 
-      // 3. Klik halaman terakhir (234 entries / 10 = 24 pages)
+      // 3. Klik halaman terakhir
       cy.get("button svg.lucide-chevrons-right").parent().click();
-      cy.contains("Showing 81 to 81 of 81 entries").should("be.visible");
+      cy.contains("Showing 81 to 88 of 88 entries").should("be.visible");
 
       // 4. Klik halaman pertama
       cy.get("button svg.lucide-chevrons-left").parent().click();
@@ -195,24 +195,16 @@ describe("Manajemen Pengguna (Admin)", () => {
         .should("be.visible");
     };
 
-    // Data dari image_0c1a99.png
-    // 900002 | Test User 2 | EMPLOYEE | SUPERVISOR | Cibitung
-    // 900001 | Test User 1 | EMPLOYEE | STAFF      | Semarang
-    // 900003 | Test User 3 | EMPLOYEE | MANAGER    | Surabaya
-
-    it("harus bisa mencari dan mengubah peran 'Test User 2' menjadi HR_BRANCH", () => {
-      // --- PERUBAHAN: Kirim ID Karyawan '900002' ---
-      editUserRole("900002", "Test User 2", "EMPLOYEE", "HR_BRANCH");
+    it("harus bisa mencari dan mengubah peran 'Aida Ai' menjadi HR_BRANCH", () => {
+      editUserRole("90902", "Aida Ai", "EMPLOYEE", "HR_BRANCH");
     });
 
-    it("harus bisa mencari dan mengubah peran 'Test User 1' menjadi ADMIN", () => {
-      // --- PERUBAHAN: Kirim ID Karyawan '900001' ---
-      editUserRole("900001", "Test User 1", "EMPLOYEE", "ADMIN");
+    it("harus bisa mencari dan mengubah peran 'Wesa Sandhika' menjadi ADMIN", () => {
+      editUserRole("90901", "Wesa Sandhika", "EMPLOYEE", "ADMIN");
     });
 
-    it("harus bisa mencari dan mengubah peran 'Test User 3' menjadi HD", () => {
-      // --- PERUBAHAN: Kirim ID Karyawan '900003' ---
-      editUserRole("900003", "Test User 3", "EMPLOYEE", "HD");
+    it("harus bisa mencari dan mengubah peran 'Yanto Prasetyo' menjadi HD", () => {
+      editUserRole("90903", "Yanto Prasetyo", "EMPLOYEE", "HD");
     });
   });
 });
