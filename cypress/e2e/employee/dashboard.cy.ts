@@ -20,7 +20,7 @@ describe("Dasbor Karyawan", () => {
 
     // 5. Pastikan halaman sudah selesai loading dengan memverifikasi elemen
     // (Ini juga berfungsi sebagai assertion bahwa login berhasil)
-    cy.contains("Karyawan Tangerang").should("be.visible");
+    cy.contains("Karyawan Head Office").should("be.visible");
   });
 
   // --- GRUP 1: Tes untuk memvalidasi semua elemen ADA di halaman ---
@@ -41,13 +41,13 @@ describe("Dasbor Karyawan", () => {
     });
 
     it("harus menampilkan kartu profil karyawan dengan data yang benar", () => {
-      cy.contains("Karyawan Tangerang").should("be.visible");
-      cy.contains("NIK: EMP001TGR").should("be.visible");
+      cy.contains("Karyawan Head Office").should("be.visible");
+      cy.contains("NIK: EMP001HO").should("be.visible");
 
       // Validasi data key-value
       cy.contains("Posisi").next().should("contain", "QC Process Spv");
       cy.contains("Departemen").next().should("contain", "R&D QC/QA");
-      cy.contains("Cabang").next().should("contain", "ICBP-Noodle Tangerang");
+      cy.contains("Cabang").next().should("contain", "ICBP-Noodle Head Office");
     });
 
     it('harus menampilkan kartu peringatan "Lengkapi Profil"', () => {
@@ -137,7 +137,7 @@ describe("Dasbor Karyawan", () => {
       // URL harus tetap /dashboard (karena sudah login)
       cy.url().should("include", "/dashboard");
       // Pastikan kartu profil masih ada
-      cy.contains("Karyawan Tangerang").should("be.visible");
+      cy.contains("Karyawan Head Office").should("be.visible");
     });
 
     // Tes fungsionalitas Logout

@@ -41,7 +41,7 @@ describe("Pengujian Halaman Login Admin", () => {
   // SKENARIO 2: Percobaan Gagal - Berbagai Input Tidak Valid
   // ------------------------------------------
   context("SKENARIO 2: Percobaan Gagal - Input Tidak Valid", () => {
-    it("Harus menampilkan validasi HTML5 saat submit form kosong", () => {
+    it("Harus menampilkan validasi saat submit form kosong", () => {
       cy.get('button[type="submit"]').click();
       cy.get('input[id="employeeId"]').should(
         "have.prop",
@@ -51,7 +51,7 @@ describe("Pengujian Halaman Login Admin", () => {
       cy.get('input[id="employeeId"]:invalid').should("exist");
     });
 
-    it("Harus menampilkan validasi HTML5 jika hanya password yang kosong", () => {
+    it("Harus menampilkan validasi jika hanya password yang kosong", () => {
       cy.get('input[id="employeeId"]').type("123456"); // NIK diisi
       cy.get('button[type="submit"]').click();
       cy.get('input[id="employeeId"]:invalid').should("not.exist");
@@ -156,7 +156,7 @@ describe("Pengujian Halaman Login Admin", () => {
       cy.url().should("include", "/login");
     });
 
-    it("Harus menampilkan validasi HTML5 untuk input yang hanya berisi spasi", () => {
+    it("Harus menampilkan validasi untuk input yang hanya berisi spasi", () => {
       cy.get('input[id="employeeId"]').type("     "); // Input spasi
       cy.get('input[id="password"]').type("     "); // Input spasi
       cy.get('button[type="submit"]').click();
