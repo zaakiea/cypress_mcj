@@ -79,8 +79,12 @@ describe("Manajemen Cabang (Admin)", () => {
 
       // 4. Hapus pencarian
       cy.get('input[placeholder="Search..."]').clear();
+      cy.get('input[placeholder="Search..."]').type("ICBP-Noodle XYZ");
+      cy.wait(500);
+      cy.contains("No results found.").should("be.visible");
 
       // 5. Pastikan data kembali seperti semula
+      cy.get('input[placeholder="Search..."]').clear();
       cy.get("table tbody tr").should("have.length", 10);
       cy.contains("ICBP-Noodle Head Office").should("be.visible");
     });

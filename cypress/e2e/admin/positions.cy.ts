@@ -301,7 +301,7 @@ describe("Manajemen Posisi (Admin)", () => {
     it("seharusnya bisa mencari posisi dan mengedit semua datanya", () => {
       // --- Data Awal & Data Baru ---
       const namaPosisiLama = "Staff IT Cypress";
-      const namaPosisiBaru = "Staff IT Senpai";
+      const namaPosisiBaru = "Admin Jual Beli";
       const levelBaru = "MANAGER";
       const cabangBaru = "ICBP-Noodle DKI";
       const departemenBaru = "ADM HR";
@@ -380,7 +380,7 @@ describe("Manajemen Posisi (Admin)", () => {
     // =====================================================================================
     it("seharusnya bisa mencari posisi lalu menghapusnya", () => {
       cy.log("Memulai tes penghapusan data");
-      const namaPosisiTarget = "Staff IT Senpai";
+      const namaPosisiTarget = "Admin Jual Beli";
 
       // 1. Cari posisi yang ingin dihapus
       cy.get('input[placeholder="Search..."]').type(namaPosisiTarget);

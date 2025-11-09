@@ -59,7 +59,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       cy.get("table tbody tr").should("have.length", 10);
       // Verifikasi total entri dari HTML Data Karyawan
-      cy.contains("Showing 1 to 10 of 1632 entries").should("be.visible");
+      cy.contains("Showing 1 to 10 of 81 entries").should("be.visible");
 
       // 2. Buka dropdown
       cy.get("@selectShow").click();
@@ -73,7 +73,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       // Asumsi API mengembalikan 25 baris
       cy.get("table tbody tr").should("have.length", 25);
       // Verifikasi info paginasi diperbarui
-      cy.contains("Showing 1 to 25 of 1632 entries")
+      cy.contains("Showing 1 to 25 of 81 entries")
         .scrollIntoView()
         .should("be.visible");
 
@@ -89,7 +89,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       // Asumsi API mengembalikan 50 baris
       cy.get("table tbody tr").should("have.length", 50);
       // Verifikasi info paginasi diperbarui
-      cy.contains("Showing 1 to 50 of 1632 entries")
+      cy.contains("Showing 1 to 50 of 81 entries")
         .scrollIntoView()
         .should("be.visible");
     });
@@ -116,21 +116,21 @@ describe("Admin - Manajemen Data Karyawan", () => {
       };
 
       // --- Skenario 1: Pencarian berdasarkan ID Jabatan (Kolom 0) ---
-      const idJabatan = "401467";
+      const idJabatan = "7213489";
       cy.log(`Mencari berdasarkan ID Jabatan: ${idJabatan}`);
       searchInput.clear().type(idJabatan);
       cy.wait(500);
       verifyColumnContains(0, idJabatan);
 
       // --- Skenario 2: Pencarian berdasarkan Nama Karyawan (Kolom 1) ---
-      const namaKaryawan = "Yusneli";
+      const namaKaryawan = "Bagus Santoso";
       cy.log(`Mencari berdasarkan Nama Karyawan: ${namaKaryawan}`);
       searchInput.clear().type(namaKaryawan);
       cy.wait(500);
       verifyColumnContains(1, namaKaryawan);
 
       // --- Skenario 3: Pencarian berdasarkan Posisi (Kolom 2) ---
-      const posisi = "Security Grp Leader";
+      const posisi = "Buyer";
       cy.log(`Mencari berdasarkan Posisi: ${posisi}`);
       searchInput.clear().type(posisi);
       cy.wait(500);
@@ -157,7 +157,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
     it("harus bisa berpindah halaman menggunakan [Paginasi]", () => {
       // (Data dari HTML Data Karyawan: 1632 entries)
-      const initialPaginationText = "Showing 1 to 10 of 1632 entries";
+      const initialPaginationText = "Showing 1 to 10 of 81 entries";
 
       // 1. Verifikasi status awal (Halaman 1)
       cy.log("State 1: Verifikasi Halaman 1");
@@ -178,7 +178,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       // 3. Verifikasi status Halaman 2
       cy.log("State 3: Verifikasi Halaman 2");
-      cy.contains("Showing 11 to 20 of 1632 entries").should("be.visible");
+      cy.contains("Showing 11 to 20 of 81 entries").should("be.visible");
       // --- PERBAIKAN ---
       cy.contains("button", /^2$/).should("have.class", "bg-primary");
       cy.contains("button", /^1$/).should("not.have.class", "bg-primary");
@@ -192,9 +192,9 @@ describe("Admin - Manajemen Data Karyawan", () => {
       cy.get("button svg.lucide-chevrons-right").parent().click();
       cy.wait(1000); // Tunggu data reload
 
-      // 5. Verifikasi Halaman Terakhir (Halaman 164 untuk 1632 data)
+      // 5. Verifikasi Halaman Terakhir
       cy.log("State 5: Verifikasi Halaman Terakhir (Halaman 164)");
-      cy.contains("Showing 1631 to 1632 of 1632 entries").should("be.visible");
+      cy.contains("Showing 81 to 81 of 81 entries").should("be.visible");
       cy.get("button svg.lucide-chevrons-right").parent().should("be.disabled");
       cy.get("button svg.lucide-chevrons-left")
         .parent()
@@ -230,7 +230,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       }); // <-- Keluar dari .within() sementara untuk mencari <div role="option">
 
       // 4. Pilih opsi (Head Office) - Opsi ini muncul di root <body>, BUKAN di dalam dialog
-      cy.get('div[role="option"]').contains("ICBP-Noodle Semarang").click();
+      cy.get('div[role="option"]').contains("ICBP-Noodle Cirebon").click();
 
       // 5. Terapkan filter [Departemen]
       cy.get('div[role="dialog"]').within(() => {
@@ -254,10 +254,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
       // 8. Verifikasi semua data di tabel
       cy.get("table tbody tr").each(($row) => {
         cy.wrap($row).find("td").eq(3).should("contain", "R&D QC/QA"); // Kolom Departemen
-        cy.wrap($row)
-          .find("td")
-          .eq(4)
-          .should("contain", "ICBP-Noodle Semarang"); // Kolom Cabang
+        cy.wrap($row).find("td").eq(4).should("contain", "ICBP-Noodle Cirebon"); // Kolom Cabang
       });
 
       // 9. Tombol filter harus terlihat aktif
@@ -289,8 +286,8 @@ describe("Admin - Manajemen Data Karyawan", () => {
     });
 
     it("harus membuka modal [Edit Karyawan] saat tombol Aksi Edit diklik", () => {
-      // 1. Cari baris untuk karyawan "A. Soleh"
-      cy.contains("tr", "A. Soleh")
+      // 1. Cari baris untuk karyawan "Aditya Nugroho"
+      cy.contains("tr", "Aditya Nugroho")
         .find("button.hover\\:text-primary") // Selector untuk tombol edit
         .click();
 
@@ -299,17 +296,17 @@ describe("Admin - Manajemen Data Karyawan", () => {
         cy.contains("h2", "Edit Karyawan").should("be.visible");
         // Cek apakah input ID Karyawan berisi data yang benar dan disabled
         cy.get('input[name="employeeId"]')
-          .should("have.value", "700961")
+          .should("have.value", "6712034")
           .and("be.disabled");
-        cy.get('input[name="fullName"]').should("have.value", "A. Soleh");
+        cy.get('input[name="fullName"]').should("have.value", "Aditya Nugroho");
         // Tutup modal
         cy.get('button[data-slot="dialog-close"]').click();
       });
     });
 
     it("harus menampilkan dialog konfirmasi [Hapus] saat tombol Aksi Hapus diklik", () => {
-      // 1. Cari baris untuk karyawan "Aan Andriani"
-      cy.contains("tr", "Aan Andriani")
+      // 1. Cari baris untuk karyawan "Andi Setiawan"
+      cy.contains("tr", "Andi Setiawan")
         .find("button.hover\\:text-red-600") // Selector untuk tombol hapus
         .click();
 
@@ -318,7 +315,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
         cy.contains("h2", "Apakah Anda yakin?").should("be.visible");
         cy.contains(
           "p",
-          "Tindakan ini akan menghapus karyawan: Aan Andriani."
+          "Tindakan ini akan menghapus karyawan: Andi Setiawan."
         ).should("be.visible");
 
         // 3. Klik batal untuk menutup dialog
@@ -327,7 +324,7 @@ describe("Admin - Manajemen Data Karyawan", () => {
 
       // 4. Pastikan dialog hilang dan data masih ada
       cy.get('div[role="alertdialog"]').should("not.exist");
-      cy.contains("td", "Aan Andriani").should("be.visible");
+      cy.contains("td", "Andi Setiawan").should("be.visible");
     });
   });
   // --- GRUP 3: Validasi Fungsionalitas CRUD (Create, Update, Delete) ---
