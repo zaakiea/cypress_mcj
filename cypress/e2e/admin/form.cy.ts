@@ -55,7 +55,7 @@ describe("Manajemen Formulir Karyawan", () => {
 
     it("harus menampilkan info paginasi yang benar (sesuai HTML)", () => {
       // Data di HTML Anda hanya 2, jadi paginasi dinonaktifkan
-      cy.contains("Showing 1 to 3 of 3 entries").should("be.visible");
+      cy.contains("Showing 1 to 4 of 4 entries").should("be.visible");
       cy.get("button").contains("2").should("not.exist");
       cy.get("button svg.lucide-chevrons-right").parent().should("be.disabled");
     });
@@ -65,12 +65,12 @@ describe("Manajemen Formulir Karyawan", () => {
   describe("Validasi Fungsionalitas (Interactions)", () => {
     it("harus bisa memfilter tabel menggunakan [Search]", () => {
       // 1. Cari data spesifik (Test Employee 2)
-      cy.get('input[placeholder="Search..."]').type("Test Karyawan 2");
+      cy.get('input[placeholder="Search..."]').type("Edward Julianto");
       cy.wait(1000); // Tunggu debounce (750ms)
 
       // 2. Pastikan hanya data yang dicari yang muncul
       cy.get("table tbody tr").should("have.length", 1);
-      cy.get("table tbody tr").first().should("contain", "09091");
+      cy.get("table tbody tr").first().should("contain", "9912");
 
       // 3. Pastikan data lain hilang
       cy.contains("09090").should("not.exist");
@@ -146,7 +146,7 @@ describe("Manajemen Formulir Karyawan", () => {
       cy.contains("Show")
         .next('button[role="combobox"]')
         .should("contain", "10");
-      cy.get("table tbody tr").should("have.length", 3);
+      cy.get("table tbody tr").should("have.length", 4);
 
       // Buka dropdown
       cy.contains("Show").next('button[role="combobox"]').click();
@@ -155,12 +155,12 @@ describe("Manajemen Formulir Karyawan", () => {
       cy.get('div[role="option"]').contains("25").click();
       cy.wait(1000); // Tunggu data reload
 
-      // Verifikasi nilai berubah ke 25, tapi data tetap 2
+      // Verifikasi nilai berubah ke 25, tapi data tetap 4
       cy.contains("Show")
         .next('button[role="combobox"]')
         .should("contain", "25");
-      cy.get("table tbody tr").should("have.length", 3);
-      cy.contains("Showing 1 to 3 of 3 entries").should("be.visible");
+      cy.get("table tbody tr").should("have.length", 4);
+      cy.contains("Showing 1 to 4 of 4 entries").should("be.visible");
     });
 
     it("harus bisa mengganti urutan [Sorting] kolom 'Nama Lengkap'", () => {
@@ -168,9 +168,8 @@ describe("Manajemen Formulir Karyawan", () => {
       cy.get("table th").contains("Nama Lengkap").as("headerNama");
 
       // Simpan data awal
-      const firstRowText = "Test Karyawan 1";
-      const secondRowText = "Test Karyawan 2";
-      const thirdRowText = "Test Karyawan 3";
+      const firstRowText = "Adinda Vivi";
+      const lastRowText = "Yanto Prasetyo";
       cy.get("table tbody tr:first-child td:nth-child(2)").should(
         "contain",
         firstRowText
@@ -198,7 +197,7 @@ describe("Manajemen Formulir Karyawan", () => {
       // Data harus berbalik
       cy.get("table tbody tr:first-child td:nth-child(2)").should(
         "contain",
-        thirdRowText
+        lastRowText
       );
 
       // 4. Klik lagi untuk Unsorted
@@ -214,9 +213,9 @@ describe("Manajemen Formulir Karyawan", () => {
       );
     });
 
-    it("harus membuka modal [View Form] untuk Karyawan 1 (09090)", () => {
-      const employeeId = "09090";
-      const employeeName = "Test Karyawan 1";
+    it("harus membuka modal [View Form] untuk Karyawan", () => {
+      const employeeId = "9912";
+      const employeeName = "Edward Julianto";
 
       // 1. Cari baris berdasarkan ID, lalu klik tombol Aksi (mata)
       cy.contains("td", employeeId)
@@ -239,37 +238,6 @@ describe("Manajemen Formulir Karyawan", () => {
 
         cy.contains("h3", "Preferensi Karir").scrollIntoView();
         cy.contains("h3", "Preferensi Karir").should("be.visible");
-      });
-
-      // 4. Tutup modal dengan mengklik tombol 'X'
-      cy.get('button[data-slot="dialog-close"]').click();
-      cy.get('div[role="dialog"]').should("not.exist");
-    });
-
-    it("harus membuka modal [View Form] untuk Karyawan 2", () => {
-      const employeeId = "09091";
-      const employeeName = "Test Karyawan 2";
-
-      // 1. Cari baris berdasarkan ID, lalu klik tombol Aksi (mata)
-      cy.contains("td", employeeId)
-        .parent("tr")
-        .find("button.hover\\:text-primary") // Selector untuk tombol 'lucide-eye'
-        .click();
-
-      // 2. Verifikasi modal (dialog) muncul
-      cy.get('div[role="dialog"]').should("be.visible");
-
-      // 3. Gunakan .within() untuk memvalidasi konten di dalam modal
-      cy.get('div[role="dialog"]').within(() => {
-        // a. Verifikasi judul popup dan ID Karyawan (DINAMIS)
-        cy.contains("h2", `Detail Formulir: ${employeeName}`).should(
-          "be.visible"
-        );
-        cy.contains("p", `ID Karyawan: ${employeeId}`).should("be.visible");
-        cy.contains("h3", "Preferensi Karir").scrollIntoView();
-        cy.contains("h3", "Preferensi Karir").should("be.visible");
-        // b. (Opsional) Kita bisa tambahkan cek data, tapi untuk
-        //    tes ini, validasi judul dan ID sudah cukup.
       });
 
       // 4. Tutup modal dengan mengklik tombol 'X'

@@ -137,7 +137,6 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       // 10. Verifikasi semua data di tabel
       cy.get("table tbody tr").should("have.length", 1);
       cy.contains("td", "Ahmad Fauzan").should("be.visible");
-      cy.contains("td", "Test Karyawan 2").should("not.exist");
 
       // Verifikasi lebih detail per kolom
       cy.get("table tbody tr").each(($row) => {
@@ -165,9 +164,10 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
 
       // 14. Verifikasi data kembali seperti semula
       cy.get("table tbody tr").should("have.length.gte", 4);
-      cy.contains("td", "Test Karyawan 1").should("be.visible");
-      cy.contains("td", "Test Karyawan 2").should("be.visible");
-      cy.contains("td", "Test Karyawan 3").should("be.visible");
+      cy.contains("td", "Adinda Vivi").should("be.visible");
+      cy.contains("td", "Ahmad Fauzan").should("be.visible");
+      cy.contains("td", "Edward Julianto").should("be.visible");
+      cy.contains("td", "Yanto Prasetyo").should("be.visible");
     });
 
     it('harus bisa mengganti urutan [Sorting] kolom "Nama"', () => {
@@ -175,8 +175,8 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
       cy.get("table th").contains("Nama").as("headerNama");
 
       // Simpan data awal
-      const firstRowText = "Ahmad Fauzan";
-      const secondRowText = "Test Karyawan 3";
+      const firstRowText = "Adinda Vivi";
+      const secondRowText = "Yanto Prasetyo";
 
       // --- PERBAIKAN 1: Verifikasi Status Awal (Ascending) ---
       // Berdasarkan HTML, status awal adalah 'arrow-up' (Ascending)
@@ -236,7 +236,7 @@ describe("Admin - Hasil Kuesioner Kompetensi", () => {
 
     it("harus bernavigasi ke halaman detail saat tombol [Aksi] diklik", () => {
       // 1. Cari baris
-      cy.contains("td", "Ahmad Fauzan")
+      cy.contains("td", "Yanto Prasetyo")
         .parent("tr")
         .find("td")
         .last() // Dapatkan sel 'Aksi'
