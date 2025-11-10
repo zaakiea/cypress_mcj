@@ -2,8 +2,8 @@
 
 describe("Employee Questionnaire Flow", () => {
   // --- Variabel untuk kredensial login ---
-  const testEmployeeNip = "T03";
-  const testEmployeePassword = "T0310112025";
+  const testEmployeeNip = "T05";
+  const testEmployeePassword = "T0510112025";
 
   beforeEach(() => {
     // 1. Kunjungi halaman login
